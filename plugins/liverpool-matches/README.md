@@ -2,6 +2,8 @@
 
 A Degoog result slot for Liverpool FC scores and fixtures. It appears above web results only when a query has clear Liverpool match intent.
 
+Provider timestamps are stored as UTC. The browser converts each kickoff to the user's local timezone and displays its timezone abbreviation.
+
 ## Example searches
 
 - `lfc`

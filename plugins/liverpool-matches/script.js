@@ -11,6 +11,7 @@
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
+      timeZoneName: "short",
     }).format(date);
     element.title = `${date.toLocaleString()} (${Intl.DateTimeFormat().resolvedOptions().timeZone})`;
     element.dataset.localised = "true";
