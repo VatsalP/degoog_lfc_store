@@ -39,4 +39,4 @@ The tests do not contact external providers.
 
 ## Data-source notice
 
-API-Football is supported but requires a free account key. FixtureDownload is used for schedule fallback. ESPN fallback uses undocumented public JSON endpoints, is enabled by default for zero-configuration operation, and may stop working if ESPN changes them.
+API-Football is supported but requires a free account key. FixtureDownload is used for schedule fallback. ESPN live-score cross-checking uses undocumented public JSON endpoints, is enabled by default for zero-configuration operation, and may stop working if ESPN changes them.

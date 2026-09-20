@@ -19,7 +19,7 @@ Searches about Liverpool the city, such as `Liverpool weather`, do not activate 
 ## Data sources
 
 1. **API-Football** when a key is configured. Its free plan is sufficient for light personal use, but has a daily request quota.
-2. **ESPN's public JSON endpoints** when API-Football is unavailable and the fallback is enabled. These endpoints are undocumented and may change without notice.
+2. **ESPN's public JSON endpoints** to cross-check today's live score and, when API-Football is unavailable, provide the full fallback. These endpoints are undocumented and may change without notice.
 3. **FixtureDownload** for Premier League and Champions League schedules and completed results. This source is not treated as live.
 
 No HTML match pages are scraped. Every card identifies its source.
@@ -47,6 +47,7 @@ The cache is held in the Degoog server process and is reset when Degoog restarts
 - Normal fixtures: 60 minutes by default
 - Match within 24 hours: 30 minutes
 - Match within 90 minutes: 10 minutes
+- Scheduled kickoff up to four hours ago: 2 minutes, so a slow schedule feed cannot hide a live match
 - Live match: 2 minutes
 - Stale-if-error copy: 24 hours
 

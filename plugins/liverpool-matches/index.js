@@ -59,9 +59,14 @@ export const mergeMatches = (groups) => {
     if (!match?.kickoff) continue;
     const key = matchKey(match);
     const current = merged.get(key);
-    if (!current || (match.sourcePriority || 0) > (current.sourcePriority || 0)) {
-      merged.set(key, match);
-    }
+    const currentHasState = current && current.status !== "scheduled";
+    const candidateHasState = match.status !== "scheduled";
+    const candidateIsBetter =
+      !current ||
+      (candidateHasState && !currentHasState) ||
+      (candidateHasState === currentHasState &&
+        (match.sourcePriority || 0) > (current.sourcePriority || 0));
+    if (candidateIsBetter) merged.set(key, match);
   }
   return [...merged.values()].sort(
     (a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime(),
@@ -71,14 +76,19 @@ export const mergeMatches = (groups) => {
 const cacheTtl = (matches, now) => {
   if (matches.some((match) => LIVE_STATUSES.has(match.status))) return 2 * 60 * 1000;
 
-  const future = matches
+  const scheduledDiffs = matches
     .filter((match) => match.status === "scheduled")
     .map((match) => new Date(match.kickoff).getTime() - now.getTime())
-    .filter((diff) => diff >= -30 * 60 * 1000)
-    .sort((a, b) => a - b)[0];
+    .filter(Number.isFinite)
+    .sort((a, b) => Math.abs(a) - Math.abs(b));
+  const nearest = scheduledDiffs[0];
 
-  if (future != null && future <= 90 * 60 * 1000) return 10 * 60 * 1000;
-  if (future != null && future <= DAY_MS) return 30 * 60 * 1000;
+  // A schedule-only provider may not flip its status at kickoff. Keep probing
+  // live providers for the length of a football match instead of caching the
+  // stale "scheduled" state for an hour.
+  if (nearest != null && nearest <= 0 && nearest >= -4 * HOUR_MS) return 2 * 60 * 1000;
+  if (nearest != null && nearest <= 90 * 60 * 1000 && nearest > 0) return 10 * 60 * 1000;
+  if (nearest != null && nearest <= DAY_MS && nearest > 0) return 30 * 60 * 1000;
   return normalCacheMinutes * 60 * 1000;
 };
 
@@ -99,8 +109,12 @@ const getMatchData = async (fetchFn, now = new Date()) => {
     : { ok: false, matches: [], reason: "API-Football key not configured" };
 
   let espn = { ok: false, matches: [], reason: "ESPN fallback disabled" };
-  if (enableEspnFallback && (!primary.ok || primary.matches.length === 0)) {
-    espn = await fetchEspnMatches({ fetchFn, now });
+  if (enableEspnFallback) {
+    espn = await fetchEspnMatches({
+      fetchFn,
+      now,
+      includeSchedules: !primary.ok || primary.matches.length === 0,
+    });
   }
 
   const fixtures = await fixturePromise;
@@ -140,7 +154,7 @@ const getMatchData = async (fetchFn, now = new Date()) => {
 export const hasLiverpoolMatchIntent = (query) => {
   const q = String(query || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
   if (q === "lfc") return true;
-  const hasLiverpool = /\b(liverpool|liverpool fc|lfc)\b/.test(q);
+  const hasLiverpool = /\b(liverpool|liverpool fc|liverpoolfc|lfc)\b/.test(q);
   if (!hasLiverpool) return false;
   return /\b(score|scores|live|match|matches|fixture|fixtures|result|results|playing|play|played|game|games|football|soccer|kickoff|kick off|next|today|tonight|tomorrow|versus|vs)\b/.test(q);
 };
@@ -294,7 +308,8 @@ export const slot = {
       key: "enableEspnFallback",
       label: "Enable ESPN fallback",
       type: "toggle",
-      description: "Use ESPN's unsupported public JSON endpoints when API-Football is unavailable.",
+      default: true,
+      description: "Cross-check today's live score using ESPN's unsupported public JSON endpoints and use it as a fallback when API-Football is unavailable.",
     },
     {
       key: "normalCacheMinutes",

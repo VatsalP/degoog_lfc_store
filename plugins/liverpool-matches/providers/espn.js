@@ -86,13 +86,12 @@ export async function fetchEspnMatches({
   fetchFn = fetch,
   leagues = DEFAULT_LEAGUES,
   now = new Date(),
+  includeSchedules = true,
 } = {}) {
   const requests = leagues.flatMap((league) => {
     const base = `${ESPN_BASE}/${encodeURIComponent(league)}`;
-    const urls = [
-      `${base}/scoreboard?dates=${espnDate(now)}&limit=100`,
-      `${base}/teams/${ESPN_TEAM_ID}/schedule`,
-    ];
+    const urls = [`${base}/scoreboard?dates=${espnDate(now)}&limit=100`];
+    if (includeSchedules) urls.push(`${base}/teams/${ESPN_TEAM_ID}/schedule`);
     return urls.map(async (url) => {
       const response = await fetchFn(url, { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error(`${league}: HTTP ${response.status}`);

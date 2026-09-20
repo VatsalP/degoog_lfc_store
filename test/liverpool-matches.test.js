@@ -16,6 +16,7 @@ test("slot triggers only for Liverpool football intent", () => {
     "lfc",
     "Liverpool live score",
     "Liverpool next match",
+    "LiverpoolFC live score",
     "Arsenal vs Liverpool",
     "when do Liverpool play?",
   ]) {
@@ -127,13 +128,29 @@ test("higher-priority source wins when providers describe the same match", () =>
   assert.equal(matches[0].id, "api");
 });
 
-test("cache TTL becomes shorter near kickoff and during live play", () => {
+test("live state from a fallback beats a higher-priority scheduled record", () => {
+  const base = {
+    kickoff: "2026-09-20T13:00:00Z",
+    homeTeam: "AFC Bournemouth",
+    awayTeam: "Liverpool",
+  };
+  const matches = mergeMatches([
+    [{ ...base, id: "api", status: "scheduled", source: "API-Football", sourcePriority: 30 }],
+    [{ ...base, homeTeam: "Bournemouth", id: "espn", status: "live", source: "ESPN", sourcePriority: 20 }],
+  ]);
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].id, "espn");
+});
+
+test("cache TTL becomes shorter near kickoff and during the expected live window", () => {
   const now = new Date("2026-09-19T12:00:00Z");
   const far = [{ kickoff: "2026-09-21T12:00:00Z", status: "scheduled" }];
   const near = [{ kickoff: "2026-09-19T13:00:00Z", status: "scheduled" }];
+  const staleScheduled = [{ kickoff: "2026-09-19T11:00:00Z", status: "scheduled" }];
   const live = [{ kickoff: "2026-09-19T11:00:00Z", status: "live" }];
 
   assert.equal(__testing.cacheTtl(far, now), 60 * 60 * 1000);
   assert.equal(__testing.cacheTtl(near, now), 10 * 60 * 1000);
+  assert.equal(__testing.cacheTtl(staleScheduled, now), 2 * 60 * 1000);
   assert.equal(__testing.cacheTtl(live, now), 2 * 60 * 1000);
 });

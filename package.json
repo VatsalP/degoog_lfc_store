@@ -8,7 +8,7 @@
       "path": "plugins/liverpool-matches",
       "name": "Liverpool Matches",
       "description": "Shows Liverpool FC live scores, recent results, and upcoming fixtures above relevant searches.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "slot",
       "minDegoogVersion": "0.26.0"
     }
