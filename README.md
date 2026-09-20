@@ -1,5 +1,7 @@
 # Live Matches Store
 
+<img src="assets/lfc-store-icon.png" alt="Liverpool Matches store icon" width="112">
+
 A small custom [Degoog](https://github.com/degoog-org/degoog) extension store focused on useful, low-cost match information.
 
 ## Included extension
@@ -15,7 +17,7 @@ A result slot that shows Liverpool FC live scores, recent results, and upcoming 
 - `liverpool fixtures`
 - `arsenal vs liverpool`
 
-The slot uses free data sources with layered fallbacks and an adaptive in-memory cache. See [the plugin documentation](plugins/liverpool-matches/README.md) for provider and configuration details.
+The slot uses free data sources with layered fallbacks and an adaptive in-memory cache. It includes match-status, fixture, venue, source, and football icons in the result panel, plus a preview image in Degoog's Store. See [the plugin documentation](plugins/liverpool-matches/README.md) for provider and configuration details.
 
 ## Add this store to Degoog
 

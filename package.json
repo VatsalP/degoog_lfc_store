@@ -2,13 +2,14 @@
   "name": "livematches-store",
   "description": "Personal Degoog extensions for Liverpool FC fixtures and live scores.",
   "author": "rnr",
+  "repo-image": "assets/lfc-store-icon.png",
   "type": "module",
   "plugins": [
     {
       "path": "plugins/liverpool-matches",
       "name": "Liverpool Matches",
       "description": "Shows Liverpool FC live scores, recent results, and upcoming fixtures above relevant searches.",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "type": "slot",
       "minDegoogVersion": "0.26.0"
     }

@@ -173,6 +173,24 @@ const esc = (value) => String(value ?? "")
   .replace(/>/g, "&gt;")
   .replace(/"/g, "&quot;");
 
+const icon = (name, className = "") => {
+  const paths = {
+    ball: '<circle cx="12" cy="12" r="9"></circle><path d="m9.5 9 2.5-2 2.5 2-.9 3h-3.2z"></path><path d="m6 5 3.5 4M18 5l-3.5 4M4 13l6.4-1M20 13l-6.4-1M8 20l2.4-8M16 20l-2.4-8"></path>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path>',
+    live: '<path d="M4.9 19.1a10 10 0 0 1 0-14.2M8.5 15.5a5 5 0 0 1 0-7M19.1 4.9a10 10 0 0 1 0 14.2M15.5 8.5a5 5 0 0 1 0 7"></path><circle cx="12" cy="12" r="1.5"></circle>',
+    history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5M12 7v5l3 2"></path>',
+    pin: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle>',
+    source: '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>',
+  };
+  return `<svg class="lfc-icon${className ? ` ${className}` : ""}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.ball}</svg>`;
+};
+
+const sectionIcon = (heading) => {
+  if (/live/i.test(heading)) return icon("live");
+  if (/result/i.test(heading)) return icon("history");
+  return icon("calendar");
+};
+
 const dateLabel = (iso) => {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "Time TBC";
@@ -219,9 +237,9 @@ const matchCard = (match, featured = false) => {
       <span class="lfc-team lfc-team--away${normalizeTeamName(match.awayTeam) === "liverpool" ? " lfc-team--liverpool" : ""}">${esc(match.awayTeam)}</span>
     </div>
     <div class="lfc-match-meta">
-      <time class="lfc-kickoff" datetime="${esc(match.kickoff)}">${esc(dateLabel(match.kickoff))}</time>
-      ${match.venue ? `<span>${esc(match.venue)}</span>` : ""}
-      <span>${esc(match.source)}</span>
+      <span class="lfc-meta-item">${icon("calendar")}<time class="lfc-kickoff" datetime="${esc(match.kickoff)}">${esc(dateLabel(match.kickoff))}</time></span>
+      ${match.venue ? `<span class="lfc-meta-item">${icon("pin")}<span>${esc(match.venue)}</span></span>` : ""}
+      <span class="lfc-meta-item">${icon("source")}<span>${esc(match.source)}</span></span>
     </div>`;
 
   if (match.sourceUrl) {
@@ -232,7 +250,7 @@ const matchCard = (match, featured = false) => {
 
 const section = (heading, matches, featuredFirst = false) => {
   if (matches.length === 0) return "";
-  return `<section class="lfc-section"><h4>${esc(heading)}</h4><div class="lfc-match-list">${matches
+  return `<section class="lfc-section"><h4>${sectionIcon(heading)}<span>${esc(heading)}</span></h4><div class="lfc-match-list">${matches
     .map((match, index) => matchCard(match, featuredFirst && index === 0))
     .join("")}</div></section>`;
 };
@@ -282,7 +300,7 @@ const renderContent = (data, intent, now = new Date()) => {
   const freshness = data.stale ? " · stale fallback" : "";
   const quota = data.apiRemaining != null ? ` · API quota ${esc(data.apiRemaining)}` : "";
   return `<div class="lfc-wrap">
-    <header class="lfc-header"><span class="lfc-mark">LFC</span><div><strong>Liverpool FC</strong><span>Fixtures and scores</span></div></header>
+    <header class="lfc-header"><span class="lfc-mark">${icon("ball", "lfc-mark-icon")}<span class="lfc-mark-text">LFC</span></span><div><strong>Liverpool FC</strong><span>Fixtures and scores</span></div></header>
     ${sections.join("")}
     <footer class="lfc-footer">Updated ${esc(relativeAge(data.fetchedAt, now))}${freshness}${quota}</footer>
   </div>`;

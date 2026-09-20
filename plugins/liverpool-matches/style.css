@@ -30,7 +30,7 @@
   font-size: 1rem;
 }
 
-.lfc-header span:not(.lfc-mark) {
+.lfc-header > div > span {
   margin-top: 0.2rem;
   color: var(--text-secondary);
   font-size: 0.75rem;
@@ -43,21 +43,51 @@
   width: 2.65rem;
   height: 2.65rem;
   flex: 0 0 auto;
+  flex-direction: column;
+  gap: 0.05rem;
   border-radius: 50%;
   background: var(--lfc-red);
   color: #fff;
-  font-size: 0.72rem;
+}
+
+.lfc-mark-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.lfc-mark-text {
+  font-size: 0.5rem;
   font-weight: 800;
   letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.lfc-icon {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .lfc-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0 0 0.45rem;
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.lfc-section h4 .lfc-icon {
+  color: var(--lfc-red);
 }
 
 .lfc-match-list {
@@ -170,6 +200,19 @@ a.lfc-match:hover {
   font-size: 0.72rem;
 }
 
+.lfc-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.lfc-meta-item .lfc-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  opacity: 0.8;
+}
+
 .lfc-footer {
   color: var(--text-secondary);
   font-size: 0.7rem;
@@ -201,7 +244,7 @@ a.lfc-match:hover {
     min-width: 2.8rem;
   }
 
-  .lfc-match-meta span:last-child {
+  .lfc-match-meta > .lfc-meta-item:last-child {
     display: none;
   }
 }

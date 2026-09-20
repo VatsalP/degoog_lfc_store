@@ -142,6 +142,30 @@ test("live state from a fallback beats a higher-priority scheduled record", () =
   assert.equal(matches[0].id, "espn");
 });
 
+test("rendered slot includes accessible decorative icons", () => {
+  const now = new Date("2026-09-19T12:00:00Z");
+  const html = __testing.renderContent({
+    matches: [{
+      kickoff: "2026-09-20T13:00:00Z",
+      homeTeam: "Liverpool",
+      awayTeam: "Chelsea",
+      competition: "Premier League",
+      status: "scheduled",
+      homeScore: null,
+      awayScore: null,
+      venue: "Anfield",
+      source: "FixtureDownload",
+      sourcePriority: 10,
+    }],
+    fetchedAt: now.getTime(),
+    sources: ["FixtureDownload"],
+  }, "summary", now);
+
+  assert.match(html, /class="lfc-icon/);
+  assert.match(html, /aria-hidden="true"/);
+  assert.match(html, /lfc-meta-item/);
+});
+
 test("cache TTL becomes shorter near kickoff and during the expected live window", () => {
   const now = new Date("2026-09-19T12:00:00Z");
   const far = [{ kickoff: "2026-09-21T12:00:00Z", status: "scheduled" }];
